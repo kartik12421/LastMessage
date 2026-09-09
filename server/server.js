@@ -2,15 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const path = require('path');
 
-const authRoutes = require('./routes/authRoutes');
-const communityRoutes = require('./routes/communityRoutes');
-const messageRoutes = require('./routes/messageRoutes');
+const sessionRoutes = require('./routes/sessionRoutes');
 const socketHandler = require('./socket/socketHandler');
+const redis = require('./redis/client');
 
 const app = express();
 const server = http.createServer(app);
@@ -18,46 +14,43 @@ const io = socketIo(server, {
   cors: {
     origin: process.env.CLIENT_URL || 'http://localhost:5173',
     methods: ['GET', 'POST'],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
 
-// Middleware
 app.use(express.json());
-app.use(cookieParser());
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true
+  credentials: true,
 }));
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/communities', communityRoutes);
-app.use('/api/messages', messageRoutes);
+app.use('/api/session', sessionRoutes);
 
-// Socket.io
 socketHandler(io);
 
-// Global Error Handler
 app.use((err, req, res, next) => {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  console.error(err);
+  const statusCode = err.statusCode || 500;
   res.status(statusCode).json({
-    message: err.message,
+    message: err.message || 'Server error',
     stack: process.env.NODE_ENV === 'production' ? null : err.stack,
   });
 });
 
-// Database Connection
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/anonymous_chat';
 
-mongoose.connect(MONGO_URI)
-  .then(() => {
-    console.log('Connected to MongoDB');
+const start = async () => {
+  try {
+    await redis.connect();
     server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
-  })
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-  });
+  } catch (error) {
+    console.error('Failed to connect to Redis:', error.message);
+    console.error('Make sure Redis is running. Example:');
+    console.error('  docker run -d --name redis -p 6379:6379 redis:7-alpine');
+    process.exit(1);
+  }
+};
+
+start();
