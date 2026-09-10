@@ -1,12 +1,12 @@
-require('dotenv').config();
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const cors = require('cors');
+import 'dotenv/config';
+import express from 'express';
+import http from 'node:http';
+import { Server as socketIo } from 'socket.io';
+import cors from 'cors';
 
-const sessionRoutes = require('./routes/sessionRoutes');
-const socketHandler = require('./socket/socketHandler');
-const redis = require('./redis/client');
+import sessionRoutes from './routes/sessionRoutes.js';
+import socketHandler from './socket/socketHandler.js';
+import redis from './redis/client.js';
 
 const app = express();
 const server = http.createServer(app);

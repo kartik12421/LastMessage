@@ -1,4 +1,4 @@
-const redis = require('./client');
+import redis from './client.js';
 
 const SESSION_TTL = 60 * 60 * 24; // 24 hours in seconds
 
@@ -62,7 +62,7 @@ const destroySessionData = async (sessionId) => {
   await redis.del(`${SESSION_KEY}${sessionId}`);
 };
 
-module.exports = {
+export {
   createSession,
   getSession,
   deleteSession,

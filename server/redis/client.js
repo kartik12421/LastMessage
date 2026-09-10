@@ -1,4 +1,4 @@
-const Redis = require('ioredis');
+import Redis from 'ioredis';
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
@@ -26,4 +26,4 @@ redis.on('reconnecting', () => {
   console.log('Reconnecting to Redis...');
 });
 
-module.exports = redis;
+export default redis;

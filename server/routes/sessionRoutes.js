@@ -1,6 +1,6 @@
-const express = require('express');
-const crypto = require('crypto');
-const store = require('../redis/store');
+import express from 'express';
+import crypto from 'node:crypto';
+import store from '../redis/store.js';
 const router = express.Router();
 
 const generateId = () => crypto.randomBytes(6).toString('hex');
@@ -75,4 +75,4 @@ router.post('/leave', async (req, res) => {
   return res.json({ success: true });
 });
 
-module.exports = router;
+export default router;

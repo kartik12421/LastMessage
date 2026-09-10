@@ -1,5 +1,5 @@
-const crypto = require('crypto');
-const store = require('../redis/store');
+import crypto from 'node:crypto';
+import store from '../redis/store.js';
 
 const socketHandler = (io) => {
   io.on('connection', (socket) => {
@@ -139,4 +139,4 @@ const getSocketBySession = (io, roomCode, sessionId) => {
   return null;
 };
 
-module.exports = socketHandler;
+export default socketHandler;
